@@ -14,6 +14,7 @@
   - **Janus-Pro-1B** (DeepSeek)
   - **Qwen2.5-VL-3B-Instruct** (Alibaba)
   - **Qwen3-VL-4B-Instruct** (Alibaba) [NEW]
+  - **Custom API Models** (OpenAI GPT-4V, Claude, etc.) [NEW]
 - **Intelligent Image Captioning**: Generate detailed, accurate captions for your images.
 - **Multi-task Capabilities**: Captioning, object detection, OCR, Visual Question Answering (primarily via Florence-2 and Janus-Pro-1B)
 - **Easy-to-use GUI**: Model switching, image preview, and keyboard shortcuts
@@ -29,6 +30,13 @@
 - **Template System**: Customizable prompt templates for different AI training formats
 
 ## 🆕 Latest Features
+
+### Custom Vision Model Integration
+- **API Integration**: Connect to any vision API (OpenAI GPT-4 Vision, Anthropic Claude, Google Gemini, custom models)
+- **Multiple API Formats**: Support for OpenAI, Anthropic, and generic API formats
+- **Secure Configuration**: Easy-to-use dialog for API URL and key configuration
+- **Connection Testing**: Verify API connectivity before use
+- **See [CUSTOM_MODEL_GUIDE.md](CUSTOM_MODEL_GUIDE.md) for detailed setup instructions**
 
 ### Automated Sample Prompt Generation
 - **AI Training Prompts**: Automatically generate high-quality training prompts optimized for AI-Toolkit, LoRA training, and Stable Diffusion
