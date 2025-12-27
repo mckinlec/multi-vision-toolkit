@@ -18,8 +18,9 @@ class ModelNames:
     QWEN = "qwen"
     QWEN_LOCAL = "qwen_local"
     QWEN3 = "qwen3"
+    CUSTOM = "custom"
 
-VALID_MODEL_NAMES = {ModelNames.FLORENCE2, ModelNames.JANUS, ModelNames.QWEN, ModelNames.QWEN_LOCAL, ModelNames.QWEN3}
+VALID_MODEL_NAMES = {ModelNames.FLORENCE2, ModelNames.JANUS, ModelNames.QWEN, ModelNames.QWEN_LOCAL, ModelNames.QWEN3, ModelNames.CUSTOM}
 
 class TemplateManager:
     """Manager for prompt templates across all vision models."""
@@ -113,6 +114,11 @@ class TemplateManager:
                 "caption_standard": "Describe this image concisely{trigger_word}",
                 "caption_detailed": "Provide a detailed analysis of this image, describing all visible elements, their spatial relationships, colors, textures, and any contextual information{trigger_word}",
                 "caption_creative": "Create a creative and engaging description of this image, emphasizing artistic elements, mood, and visual storytelling{trigger_word}"
+            },
+            "custom": {
+                "caption_standard": "Describe this image concisely{trigger_word}",
+                "caption_detailed": "Provide a detailed description of this image, including all visible objects, colors, composition, and any text{trigger_word}",
+                "caption_creative": "Create an artistic and evocative description of this image{trigger_word}"
             }
         }
         # Reuse Qwen templates for Qwen3
