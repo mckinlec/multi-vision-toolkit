@@ -466,6 +466,9 @@ class ModelManager:
         self._current_model = None
         self._current_model_name = None
         
+        # Custom model configurations
+        self.custom_model_config = None
+        
         # Check if models are available locally
         self.check_model_cache()
 
@@ -588,6 +591,26 @@ class ModelManager:
                         "Please be patient."
                     )
                     model = Qwen3Model()
+                
+                elif model_name.lower() == "custom-api":
+                    # Handle custom API model
+                    if self.custom_model_config is None:
+                        raise ValueError("Custom model not configured. Please configure it first.")
+                    
+                    # Import custom model class
+                    try:
+                        from models.custom_api_model import CustomAPIModel
+                    except ImportError as e:
+                        raise ImportError(f"Failed to import CustomAPIModel: {e}")
+                    
+                    # Create custom model instance
+                    model = CustomAPIModel(
+                        api_url=self.custom_model_config["url"],
+                        api_key=self.custom_model_config["api_key"],
+                        model_name=self.custom_model_config.get("model_id", "custom"),
+                        request_format=self.custom_model_config.get("format", "openai")
+                    )
+                    logger.info(f"Initialized custom API model: {self.custom_model_config['name']}")
                     
                 else:
                     raise ValueError(f"Unsupported model: {model_name}")
@@ -654,6 +677,21 @@ class ModelManager:
                 elif model_name.lower() == "qwen3":
                     error_message = (
                         "Failed to load or download Qwen3-VL-4B-Instruct model.\n\n"
+                        f"Error: {str(model_error)}"
+                    )
+                elif model_name.lower() == "custom-api":
+                    error_message = (
+                        "Failed to initialize custom API model.\n\n"
+                        "This could be due to:\n"
+                        "1. Invalid API URL or endpoint\n"
+                        "2. Authentication issues (invalid API key)\n"
+                        "3. Network connectivity problems\n"
+                        "4. Missing 'requests' library\n\n"
+                        "Solutions:\n"
+                        "- Verify your API URL and key are correct\n"
+                        "- Test the API endpoint independently\n"
+                        "- Check your network connection\n"
+                        "- Install requests: pip install requests\n\n"
                         f"Error: {str(model_error)}"
                     )
                 else:
@@ -965,15 +1003,15 @@ class ReviewGUI:
         # Model selection
         ttk.Label(controls_frame, text="Model:").pack(side=tk.LEFT, padx=5)
         self.model_var = tk.StringVar(value=self.model_name)
-        model_combo = ttk.Combobox(
+        self.model_combo = ttk.Combobox(
             controls_frame, 
             textvariable=self.model_var,
-            values=["florence2", "qwen-captioner", "qwen3"],
+            values=["florence2", "qwen-captioner", "qwen3", "custom-api"],
             state="readonly",
-            width=10
+            width=15
         )
-        model_combo.pack(side=tk.LEFT, padx=5)
-        model_combo.bind('<<ComboboxSelected>>', self._on_model_change)
+        self.model_combo.pack(side=tk.LEFT, padx=5)
+        self.model_combo.bind('<<ComboboxSelected>>', self._on_model_change)
         
         # Theme toggle
         theme_icon = "🌙" if self.theme_manager.theme == "light" else "☀️"
@@ -1593,6 +1631,25 @@ class ReviewGUI:
         """Handle model switching with error handling and progress indication"""
         try:
             new_model = self.model_var.get()
+            
+            # Handle custom API model configuration
+            if new_model == "custom-api":
+                # Check if custom model is already configured
+                if self.model_manager.custom_model_config is None:
+                    # Show configuration dialog
+                    from custom_model_dialog import CustomModelDialog
+                    dialog = CustomModelDialog(self.root)
+                    config = dialog.show()
+                    
+                    if config is None:
+                        # User cancelled, revert to previous model
+                        self.model_var.set(self.model_name)
+                        return
+                    
+                    # Save configuration
+                    self.model_manager.custom_model_config = config
+                    logger.info(f"Custom model configured: {config['name']}")
+            
             if new_model != self.model_name:
                 logger.info(f"Switching model from {self.model_name} to {new_model}")
                 
